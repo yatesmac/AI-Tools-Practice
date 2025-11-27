@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="card">
+    <div class="card-header">
+        <div>
+            <p class="eyebrow">{{ editing|yesno:"Edit todo,New todo" }}</p>
+            <h2>{{ editing|yesno:"Update task,Add a task" }}</h2>
+        </div>
+        {% if editing %}
+            <a class="ghost" href="{% url 'home' %}">Cancel edit</a>
+        {% endif %}
+    </div>
+    <form method="post" class="form-grid">
+        {% csrf_token %}
+        {{ form.non_field_errors }}
+        <label>
+            <span>Title</span>
+            {{ form.title }}
+        </label>
+        <label>
+            <span>Description</span>
+            {{ form.description }}
+        </label>
+        <div class="row">
+            <label>
+                <span>Due date</span>
+                {{ form.due_date }}
+            </label>
+            <label class="checkbox">
+                {{ form.resolved }} <span>Mark as resolved</span>
+            </label>
+        </div>
+        <button type="submit" class="primary">{{ editing|yesno:"Save changes,Add todo" }}</button>
+    </form>
+</section>
+
+<section class="card">
+    <div class="card-header">
+        <div>
+            <p class="eyebrow">Schedule</p>
+            <h2>All tasks</h2>
+        </div>
+        <span class="pill">{{ todos|length }} total</span>
+    </div>
+    <div class="todo-grid">
+        {% for item in todos %}
+            <article class="todo {% if item.resolved %}done{% elif item.due_date and item.due_date < today %}overdue{% endif %}">
+                <div>
+                    <p class="eyebrow">Due {{ item.due_date|default:"—" }}</p>
+                    <h3>{{ item.title }}</h3>
+                    <p class="muted">{{ item.description|default:"No description" }}</p>
+                </div>
+                <div class="actions">
+                    <a href="{% url 'toggle' item.id %}" class="chip">{{ item.resolved|yesno:"Reopen,Resolve" }}</a>
+                    <a href="{% url 'edit' item.id %}" class="chip ghost">Edit</a>
+                    <form action="{% url 'delete' item.id %}" method="post">
+                        {% csrf_token %}
+                        <button type="submit" class="chip danger">Delete</button>
+                    </form>
+                </div>
+            </article>
+        {% empty %}
+            <p class="muted">No todos yet. Add your first task above.</p>
+        {% endfor %}
+    </div>
+</section>
+{% endblock %}

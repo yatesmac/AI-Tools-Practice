@@ -1,0 +1,74 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="bg-white shadow-md rounded-lg overflow-hidden">
+    <div class="p-6">
+        <h2 class="text-2xl font-bold mb-4 text-gray-800">My Tasks</h2>
+
+        {% if todos %}
+        <div class="overflow-x-auto">
+            <table class="min-w-full leading-normal">
+                <thead>
+                    <tr>
+                        <th
+                            class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                            Task
+                        </th>
+                        <th
+                            class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                            Due Date
+                        </th>
+                        <th
+                            class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                            Status
+                        </th>
+                        <th
+                            class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                            Actions
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for todo in todos %}
+                    <tr>
+                        <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
+                            <p
+                                class="text-gray-900 whitespace-no-wrap {% if todo.is_completed %}line-through text-gray-500{% endif %}">
+                                {{ todo.title }}
+                            </p>
+                            {% if todo.description %}
+                            <p class="text-gray-500 text-xs">{{ todo.description|truncatechars:50 }}</p>
+                            {% endif %}
+                        </td>
+                        <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
+                            <p class="text-gray-900 whitespace-no-wrap">
+                                {{ todo.due_date|date:"M d, Y"|default:"-" }}
+                            </p>
+                        </td>
+                        <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
+                            <a href="{% url 'todo_toggle' todo.pk %}"
+                                class="relative inline-block px-3 py-1 font-semibold leading-tight cursor-pointer">
+                                <span aria-hidden="true"
+                                    class="absolute inset-0 {% if todo.is_completed %}bg-green-200{% else %}bg-yellow-200{% endif %} opacity-50 rounded-full"></span>
+                                <span
+                                    class="relative {% if todo.is_completed %}text-green-900{% else %}text-yellow-900{% endif %}">
+                                    {% if todo.is_completed %}Completed{% else %}Pending{% endif %}
+                                </span>
+                            </a>
+                        </td>
+                        <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
+                            <a href="{% url 'todo_update' todo.pk %}"
+                                class="text-blue-600 hover:text-blue-900 mr-3">Edit</a>
+                            <a href="{% url 'todo_delete' todo.pk %}" class="text-red-600 hover:text-red-900">Delete</a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <p class="text-gray-600 text-center py-4">No tasks yet. Add one to get started!</p>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
